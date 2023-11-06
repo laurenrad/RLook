@@ -1,0 +1,103 @@
+# Copyright (c) 2023 Lauren Rad
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Application: RLook
+# File: !RunImage
+# Description: The primary entry point for this application, containing its app instance.
+
+import os
+import swi
+import ctypes
+
+import rlook
+from rlook.reporter import Reporter
+from rlook.win.diskwin import DiskWindow
+import rlook.exceptions as exceptions
+
+import riscos_toolbox as toolbox
+from riscos_toolbox.objects.quit import Quit
+from riscos_toolbox.events import toolbox_handler, message_handler
+from riscos_toolbox.mixins.data_transfer import DataOpenMixin
+from riscos_toolbox.application import Application
+import riscos_toolbox.user_messages as user_messages
+
+class RLook(DataOpenMixin, Application):
+    def __init__(self):
+        super().__init__('<RLook$Dir>')
+        # Load choices file
+        c = rlook.choices.load()        
+        if c == None:
+            Reporter.print("RLook: Unable to read choices file, generating defaults.")
+        else:
+            rlook.opts = c            
+		
+    @toolbox_handler(Quit.Quit)
+    @toolbox_handler(rlook.E_MENU_QUIT)
+    def quit(self, event, id_block, poll_block):
+        toolbox.quit()
+        
+    # Event handler for Help being selected from Icon bar menu.
+    @toolbox_handler(rlook.E_HELP)
+    def help(self, event, id_block, poll_block):
+        os.system("Filer_Run <RLook$Dir>.Resources.!Help")
+		
+    # Create a new Disk window and load a file into it.
+    # Should return True on success or False on failure.
+    def _new_disk_win(self, filename):
+        Reporter.print(f"RLook: Opening file {filename}")
+        new_win = toolbox.create_object(DiskWindow.template, DiskWindow)
+        try:
+            new_win.disk_load(filename)
+        except exceptions.FormatError as e:
+            # If the file couldn't be opened, just throw the default error dialog
+            # for the exception up and return False from here.
+            raise e
+            return False
+			
+        new_win.show()
+        return True
+
+    # Open a file which has been dragged to the iconbar icon.
+    @message_handler(user_messages.data_transfer.DataLoadMessage)
+    def _load_from_drag(self, code, id_block, message):
+        Reporter.print(f"RLook: Got dataload message. File type: {message.file_type}",debug=True)
+
+        # create win and load file - note here leaf name is actually the full path despite
+        # the name
+        self._new_disk_win(message.leaf_name)
+		
+        # send ACK
+        message.your_ref = message.my_ref
+        message.action_code = user_messages.data_transfer.Messages.DataLoadAck
+        swi.swi("Wimp_SendMessage","iIi",17,ctypes.addressof(message),message.sender)
+		
+				
+    # Open a file when clicked in filer (using DataOpenMixin)
+    # This is just a stub for if and when an allocation is obtained, so this will just
+    # return false for now.		
+    def data_open(self, filename, filetype):
+        return False
+
+if __name__ == "__main__":
+	app = RLook()
+	Reporter.print("RLook: Debug is on",debug=True)
+	# Is there anywhere in here I can set minimum wimp version? Should be 380
+	app.run()
+	

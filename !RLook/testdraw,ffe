@@ -1,0 +1,12 @@
+dir <Obey$Dir>
+basic
+MODE 25
+QUIT
+python3
+import rlook.disk.diskread as diskread
+import rlook.draw as draw
+
+d = diskread.Disk("DEV/OUT")
+plot = draw.WaveformPlot(800,400,draw.Point(100,500))
+plot.plot_border()
+plot.plot_waveform(d.convert_wave(0))

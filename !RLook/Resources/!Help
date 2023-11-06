@@ -1,0 +1,30 @@
+
+	/--------------------------\
+	|   RLook Preview          |
+	|   © 2023 Lauren Rad      |
+	\--------------------------/
+	
+RLook is an application to browse sample disk images for Roland 12-bit samplers.
+This is a preview release; documentation is incomplete. However, here are some
+basic points:
+    - This is currently read-only. The ability to edit disks may be added in
+      the future, but this is an ambitious idea, so not sure.
+    - Currently only S-550 disk images are supported. The backend also
+      supports S-50 and S-330 disk images, but this is not implemented
+      fully yet.
+    - This requires the riscos_toolbox module for Python3. Install with pip 	      
+      using `python3 -m pip install riscos_toolbox
+    - RLook also currently requires PlayIt 1.73 to be installed, which
+      can be obtained here:
+	  	http://www.riscos-digitalcd.net/digitalcd/player/download.htm
+
+    - RLook is released under the MIT License. See LICENCE file for details.
+    - RLook was developed as a demonstration of the capabilities of the
+	  riscos_toolbox, but not best practices. It's sort of a mess right now.
+    - A sample disk "DEV/OUT" is included from Roland's RSB library, which is
+      believed to be in the public domain. More can be obtained online, such
+      as at: llamamusic.com/s50s550/unusual_samples.html#S55060
+      
+ For any other questions, drop me a line at https://github.com/laurenrad or
+ by email at lauren at cybertapes . com
+	  
