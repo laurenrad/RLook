@@ -496,7 +496,7 @@ class TonePane(tbox.WindowNestedMixin,Window):
             tmpfile = rlook.tempdir.name+"."+str(self.id)+str(selected)+"/wav"
             # if the wav file isn't already created, create it
             if not os.path.exists(tmpfile):
-                self.disk.export_wav(selected,tmpfile,False)
+                self.disk.export_wav(selected,tmpfile,rlook.opts.startend_playback)
             playit.play(tmpfile)
 
       # Get the placement of the main window and return an offset for showing the tone panes.
@@ -549,6 +549,8 @@ class TonePane(tbox.WindowNestedMixin,Window):
     @toolbox_handler(ScrollListSelectionEvent)
     def tone_selected(self, event, id_block, poll_block):
         self.load_tone(self.disk.tones[poll_block.item],self.disk.format)
+        if rlook.opts.autoplay:
+            self.play_tone() # Automatically play selected tone, if the option is set
     
 class SaveSample(SaveAs):
     template = "SaveSample"

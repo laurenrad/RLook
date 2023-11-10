@@ -39,7 +39,7 @@ tempdir = tempfile.TemporaryDirectory(prefix="rlook")
 opts = choices.Choices()
 
 # Flag for debug output / UI stuff
-debug_enabled = False
+debug_enabled = True
 
 # Custom event numbers - gather them all here to avoid clashes.
 E_MENU_QUIT = 0x100 # Quit from the iconbar menu

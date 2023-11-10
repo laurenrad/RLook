@@ -31,6 +31,7 @@ import os
 import ctypes
 import io
 import gc
+import sys
 
 import rlook
 import rlook.exceptions as exceptions
@@ -118,7 +119,10 @@ class DiskWindow(Window):
     # (And for now, load a test file for this)
     def disk_load(self,filename):
         self.disk = diskread.Disk(filename)
-        self.filename = filename.decode('utf-8')
+        try:
+            self.filename = filename.decode(sys.getfilesystemencoding())
+        except Exception as e:
+            Reporter.print(f"Error setting title: {e}")
 		
         # Update window title - check style guide later. this is just to differentiate
         # files during testing.

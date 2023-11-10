@@ -30,6 +30,7 @@ import rlook
 from rlook.reporter import Reporter
 from rlook.win.diskwin import DiskWindow
 import rlook.exceptions as exceptions
+import rlook.disk.exceptions as disk_exceptions
 
 import riscos_toolbox as toolbox
 from riscos_toolbox.objects.quit import Quit
@@ -65,7 +66,7 @@ class RLook(DataOpenMixin, Application):
         new_win = toolbox.create_object(DiskWindow.template, DiskWindow)
         try:
             new_win.disk_load(filename)
-        except exceptions.FormatError as e:
+        except disk_exceptions.FormatError as e:
             # If the file couldn't be opened, just throw the default error dialog
             # for the exception up and return False from here.
             raise e

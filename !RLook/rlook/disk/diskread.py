@@ -34,7 +34,7 @@ import audioop # Warning: deprecated
 import os
 import io # For convert_wave
 from rlook.reporter import Reporter
-from .exceptions import *
+from rlook.disk.exceptions import *
 from . import formats
 
 # Globals
