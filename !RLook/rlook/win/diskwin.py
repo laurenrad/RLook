@@ -277,8 +277,8 @@ class SaveAll(SaveAs):
         if self.id != id_block.self.id:
              return False # pass on event to next handler
         
-        self.file_name = os.path.basename(toolbox.get_object(id_block.ancestor.id).filename)\
-                         +"_Export"
+        fn = toolbox.get_object(id_block.ancestor.id).diskwin.filename+"_Export"
+        self.file_name = fn
         #Reporter.print(f"Save all about to show: file_name: {type(self.file_name)}",debug=True)
         #print(f"test {self.file_name}")
      
@@ -287,7 +287,7 @@ class SaveAll(SaveAs):
         # This should be the only one to use this event but check anyway
         if self.id != id_block.self.id:
             return False # pass on event to next handler
-
+        Reporter.print(f"safe to file event: {self.file_name}")
         parent_win = toolbox.get_object(id_block.ancestor.id)     
         
         save_temp = poll_block.filename.decode(sys.getfilesystemencoding())
