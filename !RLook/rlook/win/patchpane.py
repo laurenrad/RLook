@@ -60,8 +60,9 @@ class PatchPane(tbox.WindowNestedMixin,Window):
     G_KEYASSIGN   = 0x0F # DisplayField for key assign
     G_OUTASSIGN   = 0x10 # DisplayField for output assign
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template, id) # Will call Object constructor
+        self.diskwin = diskwin # Keep reference to document window
         Reporter.print(f"RLook: PatchPane created. id={hex(self.id)}",debug=True)
         self.disk = None
         

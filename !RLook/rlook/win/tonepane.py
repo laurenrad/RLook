@@ -52,8 +52,9 @@ class ToneNav(Window):
 class ToneMain(tbox.WindowNestedMixin,Window):
     template = "ToneMain"
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template,id)
+        self.diskwin = diskwin
         
         # Set up gadgets
         self.g_name = DisplayField(self,0x01)
@@ -143,8 +144,9 @@ class ToneMain(tbox.WindowNestedMixin,Window):
 class ToneLoop(tbox.WindowNestedMixin,Window):
     template = "ToneLoop"
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template,id)
+        self.diskwin = diskwin
         
         # Set up gadgets
         self.g_mode = DisplayField(self,0x01)
@@ -184,8 +186,8 @@ class ToneLoop(tbox.WindowNestedMixin,Window):
 class ToneLFO(tbox.WindowNestedMixin,Window):
     template = "ToneLFO"
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template, id)
         
         # Set up gadgets
         self.g_rate = DisplayField(self,0x01)
@@ -233,8 +235,9 @@ class ToneTVF(tbox.WindowNestedMixin,Window):
             
         return gadgets
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template,id)
+        self.diskwin = diskwin
         
         # Set up gadgets
         self.g_cutoff = DisplayField(self,0x01)
@@ -320,8 +323,8 @@ class ToneTVA(tbox.WindowNestedMixin,Window):
             
         return gadgets
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template,id)
         
         # Set up gadgets
         self.g_lfo_depth = DisplayField(self,0x35)
@@ -435,19 +438,19 @@ class TonePane(tbox.WindowNestedMixin,Window):
     G_TVA = 0x08
     G_WAVE = 0x09
     
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.disk = None
-        
-        Reporter.print(f"RLook: TonePane Created. id={hex(self.id)}")
+    def __init__(self, template, id, diskwin):
+        super().__init__(template,id) # Will call Object constructor
+        self.disk = None        
+        self.diskwin = diskwin
+        Reporter.print(f"RLook: TonePane Created. id={hex(self.id)} diskwin={self.diskwin}")
         
         # Set up gadgets and child objects
         self.g_tonelist = ScrollListPlus(self,TonePane.G_TONE_LIST)
-        self.tone_lfo = toolbox.create_object(ToneLFO.template,ToneLFO)
-        self.tone_loop = toolbox.create_object(ToneLoop.template,ToneLoop)
-        self.tone_main = toolbox.create_object(ToneMain.template,ToneMain)
-        self.tone_tva = toolbox.create_object(ToneTVA.template,ToneTVA)
-        self.tone_tvf = toolbox.create_object(ToneTVF.template,ToneTVF)
+        self.tone_main = toolbox.create_object(ToneMain.template,ToneMain,[self])
+        self.tone_lfo = toolbox.create_object(ToneLFO.template,ToneLFO,[self])
+        self.tone_loop = toolbox.create_object(ToneLoop.template,ToneLoop,[self])       
+        self.tone_tva = toolbox.create_object(ToneTVA.template,ToneTVA,[self])
+        self.tone_tvf = toolbox.create_object(ToneTVF.template,ToneTVF,[self])
         self.tone_saveas = toolbox.create_object(SaveSample.template,SaveSample)
         self.waveform = toolbox.create_object(WaveformView.template,WaveformView)
             
@@ -581,7 +584,7 @@ class SaveSample(SaveAs):
         # ctypes gymnastics to get the actual start address
         # of the data as an int, which is needed to pass to 
         # set_data_address.
-        wav_out = tonepane.disk.get_wav(selected)
+        wav_out = tonepane.disk.get_wav(selected,rlook.opts.startend_export)
         dataptr = ctypes.c_char_p(wav_out)
         addr = ctypes.cast(dataptr,ctypes.c_void_p).value
         

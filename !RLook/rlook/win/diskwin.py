@@ -104,13 +104,14 @@ class DiskWindow(Window):
 	
     def __init__(self, *args):
         super().__init__(*args)
+        self.diskwin = self # Store named reference to self to simplify menu handling code
         self.filename = ""
         try:
-            self.funcpane = toolbox.create_object(FuncPane.template,FuncPane)
-            self.midipane = toolbox.create_object(MIDIPane.template,MIDIPane)
-            self.patchpane = toolbox.create_object(PatchPane.template,PatchPane)
-            self.tonepane = toolbox.create_object(TonePane.template,TonePane)
-            self.tonebar = toolbox.create_object(ToneNav.template, ToneNav)
+            self.funcpane = toolbox.create_object(FuncPane.template,FuncPane,args=[self])
+            self.midipane = toolbox.create_object(MIDIPane.template,MIDIPane,args=[self])
+            self.patchpane = toolbox.create_object(PatchPane.template,PatchPane,args=[self])
+            self.tonepane = toolbox.create_object(TonePane.template,TonePane,args=[self])
+            self.tonebar = toolbox.create_object(ToneNav.template,ToneNav)
             Reporter.print(f"Created DiskWindow. id={hex(self.id)}")
         except Exception as e:
             Reporter.print(repr(e))	
@@ -272,12 +273,14 @@ class SaveAll(SaveAs):
         
     @toolbox_handler(tbox.SaveAsAboutToBeShownEvent)
     def about_to_show(self, event, id_block, poll_block):
-         
+        Reporter.print("about_to_show") 
         if self.id != id_block.self.id:
              return False # pass on event to next handler
         
         self.file_name = os.path.basename(toolbox.get_object(id_block.ancestor.id).filename)\
                          +"_Export"
+        #Reporter.print(f"Save all about to show: file_name: {type(self.file_name)}",debug=True)
+        #print(f"test {self.file_name}")
      
     @toolbox_handler(SaveToFileEvent)
     def save_to_file(self, event, id_block, poll_block):
@@ -287,7 +290,9 @@ class SaveAll(SaveAs):
 
         parent_win = toolbox.get_object(id_block.ancestor.id)     
         
-        save_temp = poll_block.filename.decode('utf-8')
+        save_temp = poll_block.filename.decode(sys.getfilesystemencoding())
+        Reporter.print("FOLDER NAME "+repr(poll_block.filename))
+            
         try:
             os.mkdir(save_temp)
             parent_win.disk.export_disk_report(save_temp+".Report/txt")
@@ -296,7 +301,7 @@ class SaveAll(SaveAs):
             for i in range(0,32):
                 newfile = save_temp+"."+\
                           rlook.tone_filename(i,parent_win.disk.tones[i].lookup("NAME"))
-                parent_win.disk.export_wav(i,newfile)
+                parent_win.disk.export_wav(i,newfile,rlook.opts.startend_export)
                 swi.swi("OS_File","isI",18,newfile,0xfb1) # Set file type
         except Exception as e:
             Reporter.print(f"RLook: Something went wrong trying to save files: {e}")
@@ -328,7 +333,10 @@ class SaveReport(SaveAs):
         if self.id != id_block.self.id:
             return False # pass on event to next handler
 		
-        disk = toolbox.get_object(id_block.ancestor.id).disk
+        # Because of the double nested windows and no client handles, 
+        # each pane has a reference to its toplevel disk window. So,
+        # use this to get the disk.
+        disk = toolbox.get_object(id_block.ancestor.id).diskwin.disk
         buf = io.BytesIO()
         for key,value in disk.function.values.items():
             buf.write(bytes(f"{key}: {value}\n","utf-8"))

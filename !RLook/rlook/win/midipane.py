@@ -58,8 +58,9 @@ class MIDIPane(tbox.WindowNestedMixin,Window):
 			
         return gadgets
 	
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template, id) # Will call Object constructor
+        self.diskwin = diskwin # Keep reference to document window
         Reporter.print(f"RLook: Created MIDIPane. id={hex(self.id)}",debug=True)
 		
         # Set up gadgets

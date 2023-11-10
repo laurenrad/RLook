@@ -57,8 +57,10 @@ class FuncPane(tbox.WindowNestedMixin,Window):
             
         return gadgets
     
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, template, id, diskwin):
+        super().__init__(template, id) # Will call Object constructor
+        self.diskwin = diskwin # Store reference to document window
+        
         # Create gadget objects
         self.g_disklabel = TextArea(self, FuncPane.G_DISKLABEL)
         self.g_disklabel.text = "" # Needed to work around a Toolbox bug
