@@ -217,15 +217,15 @@ class DiskMenu(Menu):
             # Fade play entry
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.id,2,DiskMenu.ENTRY_PLAY,1)
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.filemenu.id,2,
-                    DiskMenu.ENTRY_FILE_SELECTED,1)
+                    DiskMenu.ENTRY_FILE_SELECTED,0)
         elif parent_class == MIDIPane:
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.id,2,DiskMenu.ENTRY_PLAY,1)
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.filemenu.id,2,
-                    DiskMenu.ENTRY_FILE_SELECTED,1)
+                    DiskMenu.ENTRY_FILE_SELECTED,0)
         elif parent_class == PatchPane:
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.id,2,DiskMenu.ENTRY_PLAY,1)
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.filemenu.id,2,
-                    DiskMenu.ENTRY_FILE_SELECTED,1)
+                    DiskMenu.ENTRY_FILE_SELECTED,0)
         elif parent_class == TonePane:
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.id,2,DiskMenu.ENTRY_PLAY,0)
             swi.swi("Toolbox_ObjectMiscOp","0iiii",self.filemenu.id,2,
