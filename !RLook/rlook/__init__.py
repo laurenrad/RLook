@@ -23,7 +23,6 @@
 # This is the module for globals, common utility functions, etc
 
 import tempfile
-import swi
 
 from .disk import formatting
 from . import choices
@@ -42,21 +41,23 @@ opts = choices.Choices()
 debug_enabled = True
 
 # Custom event numbers - gather them all here to avoid clashes.
-E_MENU_QUIT = 0x100 # Quit from the iconbar menu
-E_WINDOW_CLOSE = 0x201 # Window closed
-E_HELP = 0x202 # Icon bar - Help...
+E_MENU_QUIT = 0x100  # Quit from the iconbar menu
+E_WINDOW_CLOSE = 0x201  # Window closed
+E_HELP = 0x202  # Icon bar - Help...
 
-# This takes the name of a tone and its number (unformatted) and returns
-# something usable as a filename.
-# This will attempt to sanitize the name to remove
-# prohibited chars, but is untested and probably will
-# have some issues. TODO
-# Also, spaces seem to result in filename truncation; it looks like
-# usually when I see a space in a filename added through the filer,
-# it's actually an NBSP. I'm choosing the safer option for now of
-# replacing spaces with underscores.
+
 def tone_filename(num, name):
+    """
+    Take the name of a tone and its number (unformatted) and return
+    something usable as a filename.
+    """
+    # This will attempt to sanitize the name to remove
+    # prohibited chars, but is untested and probably will
+    # have some issues. TODO
+    # Also, spaces seem to result in filename truncation; it looks like
+    # usually when I see a space in a filename added through the filer,
+    # it's actually an NBSP. I'm choosing the safer option for now of
+    # replacing spaces with underscores.
     num = formatting.roland_number(num)
-    return num+"_"+\
-            name.rstrip().translate({ord(c):None for c in '$&%@\\^:.#*"|'}).replace(' ','_') \
-            +"/wav"
+    name = name.rstrip().translate({ord(c): None for c in '$&%@\\^:.#*"|'}).replace(' ', '_')
+    return num + "_" + name + "/wav"

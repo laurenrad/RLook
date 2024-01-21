@@ -20,14 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# exceptions.py
-        
+
 class WimpCustomError(Exception):
     """
     Exception class for reporting errors through the Wimp.
     """
     def __init__(self, mess):
         self.mess = str(mess)
-        
+
     def __str__(self):
         return self.mess

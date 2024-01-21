@@ -25,9 +25,6 @@ RLook: choices.py
 Module for the Choices window in RLook.
 """
 
-import pickle
-import swi
-
 import rlook
 from rlook.reporter import Reporter
 import rlook.exceptions as exceptions
@@ -38,18 +35,19 @@ from riscos_toolbox.events import toolbox_handler
 from riscos_toolbox.objects.window import Window
 from riscos_toolbox.gadgets.actionbutton import ActionButtonSelectedEvent
 from riscos_toolbox.gadgets.optionbutton import OptionButton
-    
+
+
 class ChoicesWin(Window):
     template = "Choices"
-    
+
     # Gadget constants
-    G_OPT_PLAYPOINTS = 0x04 # Option: Use start/end points for play
-    G_OPT_XPORTPOINTS = 0x05 # Option: Use start/end points for export
-    G_OPT_AUTOPLAY = 0x06 # Option: Autoplay tones
-    G_DEFAULT = 0x00 # Button: default
-    G_SAVE = 0x01 # Button: save
-    G_CANCEL = 0x02 # Button: cancel
-    G_SET = 0x03 # Buttton: set
+    G_OPT_PLAYPOINTS = 0x04  # Option: Use start/end points for play
+    G_OPT_XPORTPOINTS = 0x05  # Option: Use start/end points for export
+    G_OPT_AUTOPLAY = 0x06  # Option: Autoplay tones
+    G_DEFAULT = 0x00  # Button: default
+    G_SAVE = 0x01  # Button: save
+    G_CANCEL = 0x02  # Button: cancel
+    G_SET = 0x03  # Buttton: set
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -58,30 +56,30 @@ class ChoicesWin(Window):
         self.g_opt_xportpoints = OptionButton(self, ChoicesWin.G_OPT_XPORTPOINTS)
         self.g_opt_autoplay = OptionButton(self, ChoicesWin.G_OPT_AUTOPLAY)
         self.refresh_gadgets()
-        Reporter.print("RLook: ChoicesWin created.",debug=True)
-        
+        Reporter.print("RLook: ChoicesWin created.", debug=True)
+
     # Update gadgets to reflect global choices
     def refresh_gadgets(self):
         self.g_opt_playpoints.state = int(rlook.opts.startend_playback)
         self.g_opt_xportpoints.state = int(rlook.opts.startend_export)
         self.g_opt_autoplay.state = int(rlook.opts.autoplay)
-        
+
     # Stores gadget states in global choices. This does NOT save to disk.
     def store_choices(self):
-        rlook.opts.set([self.g_opt_playpoints.state,\
-                        self.g_opt_xportpoints.state,\
+        rlook.opts.set([self.g_opt_playpoints.state,
+                        self.g_opt_xportpoints.state,
                         self.g_opt_autoplay.state])
-                        
+
     # Take any immediate action on setting choices. This is
     # not needed at the moment, so does nothing, but is here for expansion.
     def action_choices(self):
         pass
-        
+
     @toolbox_handler(ActionButtonSelectedEvent)
     def button_selected(self, event, id_block, poll_block):
         if id_block.self.id != self.id:
-            return False # Pass along if this is for a different window
-                        
+            return False  # Pass along if this is for a different window
+
         if id_block.self.component == ChoicesWin.G_DEFAULT:
             # On default, reset choices and refresh gadgets
             rlook.opts.reset()
@@ -89,7 +87,7 @@ class ChoicesWin(Window):
         elif id_block.self.component == ChoicesWin.G_SAVE:
             self.store_choices()
             self.action_choices()
-            if choices.save(rlook.opts) == False:
+            if choices.save(rlook.opts) is False:
                 e = exceptions.WimpCustomError("Unable to save choices.")
                 toolbox.report_exception(e)
         elif id_block.self.component == ChoicesWin.G_CANCEL:
@@ -104,6 +102,5 @@ class ChoicesWin(Window):
             self.action_choices()
         else:
             return False
-            
+
         return True
-            

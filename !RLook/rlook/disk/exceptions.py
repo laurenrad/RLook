@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# exceptions.py
+
 class FormatError(Exception):
     """
     Exception raised on invalid disk format.
@@ -28,6 +28,7 @@ class FormatError(Exception):
     """
     def __str__(self):
         return "Unrecognized file format."
+
 
 class FileSizeError(Exception):
     """
